@@ -61,11 +61,15 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
+  
+  server.listen(port, () => {
     log(`serving on port ${port}`);
+  }).on('error', (err: any) => {
+    if (err.code === 'EADDRINUSE') {
+      log(`Port ${port} is already in use. Please try a different port.`);
+    } else {
+      log(`Server error: ${err.message}`);
+    }
+    process.exit(1);
   });
 })();
